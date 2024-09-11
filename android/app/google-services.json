@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "747092674378",
+    "project_id": "retailapp-8ea0c",
+    "storage_bucket": "retailapp-8ea0c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:747092674378:android:676724689dff7533b5e3b3",
+        "android_client_info": {
+          "package_name": "com.retailapp.name"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSsJwzfa-JGC9QBZiaEoty5rgo7bETQ9o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
