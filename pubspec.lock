@@ -45,10 +45,10 @@ packages:
     dependency: "direct main"
     description:
       name: change_app_package_name
-      sha256: f734e127d334053873733fb61b1ecae73c09abb694b759a4afd26aa9c9547850
+      sha256: "1d6ca5fbaba7264f70857941543337b2efe48f19ae2eef29b89927541b52a787"
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.0"
+    version: "1.4.0"
   characters:
     dependency: transitive
     description:
@@ -345,10 +345,10 @@ packages:
     dependency: transitive
     description:
       name: freezed_annotation
-      sha256: c3fd9336eb55a38cc1bbd79ab17573113a8deccd0ecbbf926cca3c62803b5c2d
+      sha256: c2e2d632dd9b8a2b7751117abcfc2b4888ecfe181bd9fca7170d9ef02e595fe2
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.1"
+    version: "2.4.4"
   get:
     dependency: "direct main"
     description:
@@ -521,10 +521,10 @@ packages:
     dependency: "direct main"
     description:
       name: number_pagination
-      sha256: "1e06bbeeda7a8ed00c818f46a520265ed27d1d9697ec372fb08c9318194e7d08"
+      sha256: "70f5f2130610c5d5281c52578de228e0cb05a5eaf9bfbf892e7b738c16904d59"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.7"
+    version: "1.1.4"
   path:
     dependency: transitive
     description:

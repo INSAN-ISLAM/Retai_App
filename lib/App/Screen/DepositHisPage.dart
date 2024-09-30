@@ -59,11 +59,9 @@ class _OrderScreenState extends State<OrderScreen> {
                       ],
                     ),
                     SizedBox(height: 6,),
-                    Expanded(
+                    Expanded(                               //orderBy('created_at',descending:true).
                       child: StreamBuilder(
-                        stream: _firestore.collection('DepositDetails')
-                            .where('user',isEqualTo:user?.uid)
-                            .snapshots(),
+                        stream: _firestore.collection('DepositDetails').where('user',isEqualTo:user?.uid).snapshots(),
                         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             return Center(child: CircularProgressIndicator());
@@ -74,11 +72,11 @@ class _OrderScreenState extends State<OrderScreen> {
                           }
 
                           final documents = snapshot.data!.docs;
-
+                          final data = documents.where((element) => element['user'] == user!.uid).toList();
                           return ListView.builder(
-                            itemCount: documents.length,
+                            itemCount: data.length,
                             itemBuilder: (context, index) {
-                              final document = documents[index];
+                              final document = data[index];
                               var date= document['created_at'].toDate();
                               var formattedDate = DateFormat.yMMMd().format(date);
 

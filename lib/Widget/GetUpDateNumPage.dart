@@ -49,7 +49,7 @@ class _UserProfileWidgetState extends State<UserProfileWidget> {
             crossAxisAlignment: CrossAxisAlignment.center,
 mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SelectableText("Bkash Number:-${data['BkashNum']}"),
+                SelectableText("Bkash Number:-${data['BkashNum']}",),
                 SizedBox(height: 4,),
                 SelectableText("Nagad Number:-${data['NagadNum']}"),
           //Text(' Bkash Number:-${data['BkashNum']}'),

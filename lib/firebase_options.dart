@@ -30,10 +30,7 @@ class DefaultFirebaseOptions {
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -47,29 +44,40 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAe4x4hG3F3aZNyJcY-xx8lvIfUyzvsqn8',
-    appId: '1:747092674378:web:dff0d413f0888423b5e3b3',
-    messagingSenderId: '747092674378',
-    projectId: 'retailapp-8ea0c',
-    authDomain: 'retailapp-8ea0c.firebaseapp.com',
-    storageBucket: 'retailapp-8ea0c.appspot.com',
-    measurementId: 'G-Z2JLQSYB0Q',
+    apiKey: 'AIzaSyCoW2ppRGDLal7_hUl_sqiF1p9en7GleiI',
+    appId: '1:363953019706:web:bef9845fef4aad91d5ce03',
+    messagingSenderId: '363953019706',
+    projectId: 'retailappstore',
+    authDomain: 'retailappstore.firebaseapp.com',
+    storageBucket: 'retailappstore.appspot.com',
+    measurementId: 'G-BNRGYYCLY4',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDSsJwzfa-JGC9QBZiaEoty5rgo7bETQ9o',
-    appId: '1:747092674378:android:676724689dff7533b5e3b3',
-    messagingSenderId: '747092674378',
-    projectId: 'retailapp-8ea0c',
-    storageBucket: 'retailapp-8ea0c.appspot.com',
+    apiKey: 'AIzaSyBNErI78XK70QhbZnp9HR5ET6IXnDZiO6Q',
+    appId: '1:363953019706:android:9cc50a58162d69ddd5ce03',
+    messagingSenderId: '363953019706',
+    projectId: 'retailappstore',
+    storageBucket: 'retailappstore.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyB5tNNWdaIsSBN_la6Cy0RoYrTFo24bcOA',
-    appId: '1:747092674378:ios:e46fdb85e8f20288b5e3b3',
-    messagingSenderId: '747092674378',
-    projectId: 'retailapp-8ea0c',
-    storageBucket: 'retailapp-8ea0c.appspot.com',
-    iosBundleId: 'com.example.ratailapp',
+    apiKey: 'AIzaSyBykdqtfdJUdhsglgaFtl-0xBGocHtp5tQ',
+    appId: '1:363953019706:ios:d251f24b8bf68b04d5ce03',
+    messagingSenderId: '363953019706',
+    projectId: 'retailappstore',
+    storageBucket: 'retailappstore.appspot.com',
+    iosBundleId: 'com.retailapp.name',
   );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyCoW2ppRGDLal7_hUl_sqiF1p9en7GleiI',
+    appId: '1:363953019706:web:b6655a385c3045eed5ce03',
+    messagingSenderId: '363953019706',
+    projectId: 'retailappstore',
+    authDomain: 'retailappstore.firebaseapp.com',
+    storageBucket: 'retailappstore.appspot.com',
+    measurementId: 'G-J5JBY73NS9',
+  );
+
 }

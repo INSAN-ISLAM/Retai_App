@@ -69,15 +69,11 @@ class _ReceiptAcceptScreenState extends State<ReceiptAcceptScreen> {
                   SizedBox(
                     height: 5,
                   ),
-                  Expanded(
+                  Expanded(                                                //.orderBy('created_at', descending: true)
                     child: StreamBuilder(
-                      stream:
-                          _firestore.collection('ReceiptDetails')
-                              .where('user',isEqualTo:user?.uid)
-
-                              .snapshots(),
-                      builder:
-                          (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      stream: _firestore.collection('ReceiptDetails').orderBy('created_at', descending: true).snapshots(),
+                      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        print(user!.uid);
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return Center(child: CircularProgressIndicator());
@@ -88,11 +84,13 @@ class _ReceiptAcceptScreenState extends State<ReceiptAcceptScreen> {
                         }
 
                         final documents = snapshot.data!.docs;
+                        
+                        final data = documents.where((element) => element['user'] == user!.uid).toList();
 
                         return ListView.builder(
-                          itemCount: documents.length,
+                          itemCount: data.length,
                           itemBuilder: (context, index) {
-                            final document = documents[index];
+                            final document = data[index];
                             var date = document['created_at'].toDate();
                             var formattedDate = DateFormat.yMMMd().format(date);
 

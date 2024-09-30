@@ -2,9 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:ratailapp/App/Screen/AddBalancePage.dart';
-import 'package:ratailapp/App/Screen/TransferNum.dart';
-import 'package:ratailapp/Widget/AppEevatedButton.dart';
+
 import 'package:flutter/cupertino.dart';
 
 class TransferScreen extends StatefulWidget {
@@ -81,8 +79,7 @@ class _TransferScreenState extends State<TransferScreen> {
                     Expanded(
                       child: StreamBuilder(
                         stream: _firestore.collection('TransferDetails')
-                            .where('user',isEqualTo:user?.uid)
-                                .snapshots(),
+                            .where('user',isEqualTo:user?.uid).orderBy('created_at', descending: true).snapshots(),
                         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             return Center(child: CircularProgressIndicator());
@@ -93,11 +90,11 @@ class _TransferScreenState extends State<TransferScreen> {
                           }
 
                           final documents = snapshot.data!.docs;
-
+                          final data = documents.where((element) => element['user'] == user!.uid).toList();
                           return ListView.builder(
-                            itemCount: documents.length,
+                            itemCount: data.length,
                             itemBuilder: (context, index) {
-                              final document = documents[index];
+                              final document = data[index];
                               var date= document['created_at'].toDate();
                               var formattedDate = DateFormat.yMMMd().format(date);
 

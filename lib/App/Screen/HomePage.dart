@@ -6,7 +6,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+//import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -104,7 +104,22 @@ class _MyhomePageState extends State<MyhomePage> {
   double? userRate;
   HomePageController homePageController=Get.put(HomePageController());
   late int totalResult;
-  late int total_taka;
+  late num TotalUsertaka;
+
+  //
+  // void updateMoney() {
+  //   setState(() {
+  //     if (total_taka > 0) {
+  //       total_taka -= 1; // ধনাত্মক হলে এক বাদ
+  //     } else if (total_taka < 0) {
+  //       total_taka += 1; // ঋণাত্মক হলে এক যোগ
+  //     }
+  //   });
+  // }
+
+
+
+
   @override
   void initState() {
     super.initState();
@@ -113,6 +128,7 @@ class _MyhomePageState extends State<MyhomePage> {
     _transferPlusFuture = _getTransferPlusDetails();
     _transferMinusFuture = _getTransferMinusDetails();
     _fetchUserRate();
+
   }
 
   Future<QuerySnapshot> _getDepositDetails() async {
@@ -191,6 +207,7 @@ class _MyhomePageState extends State<MyhomePage> {
               _receiptFuture,
               _transferPlusFuture,
               _transferMinusFuture
+
             ]),
             builder: (BuildContext context,
                 AsyncSnapshot<List<QuerySnapshot>> snapshot) {
@@ -210,6 +227,7 @@ class _MyhomePageState extends State<MyhomePage> {
               totalUserDiamond += userDiamond;
 
               var depositAmount = doc['Amount'] ?? '0' ?? 0;
+             // var Status = doc['Status'] ?? '0' ?? 0;
               totalDepositAmount += depositAmount;
 
               DateTime now = DateTime.now();
@@ -225,12 +243,16 @@ class _MyhomePageState extends State<MyhomePage> {
               }
             });
 
+           // print('tldt:$totalDepositAmount');
+              num totalAdvanceAmount=0;
             double totalTransferDiamond = 0;
             double todayTransferDiamond = 0;
             snapshot.data![1].docs.forEach((doc) {
               double transferDiamond =
                   double.tryParse(doc['TransferDiamond'] ?? '0') ?? 0;
               totalTransferDiamond += transferDiamond;
+              var advanceAmount = doc['amount'] ?? '0' ?? 0;
+              totalAdvanceAmount += advanceAmount;
 
               DateTime now = DateTime.now();
               DateTime startOfDay = DateTime(now.year, now.month, now.day);
@@ -243,6 +265,8 @@ class _MyhomePageState extends State<MyhomePage> {
                 todayTransferDiamond += transferDiamond;
               }
             });
+              //print('tlat:$totalAdvanceAmount');
+
 
             double totalTransferPlusDiamond = 0;
             double todayTransferPlusDiamond = 0;
@@ -284,370 +308,380 @@ class _MyhomePageState extends State<MyhomePage> {
             });
 
              totalResult = ((totalUserDiamond + totalTransferMinusDiamond ) - (totalTransferDiamond + totalTransferPlusDiamond)).toInt();
-              total_taka=((100 * totalResult)~/userRate!);
-              //print(total_taka);
-            homePageController.updateResult(totalResult);
+          //   var total_taka=((100 * totalResult)~/userRate!);
+             homePageController.updateResult(totalResult);
 
-            int todayResult = ((todayUserDiamond + todayTransferMinusDiamond ) - (todayTransferPlusDiamond + todayTransferDiamond))
+            num todayResult = ((todayUserDiamond + todayTransferMinusDiamond ) - (todayTransferPlusDiamond + todayTransferDiamond))
                 .toInt();
+
+              TotalUsertaka=totalDepositAmount-totalAdvanceAmount;
               return Column(
                 children: [
-                  Card(
-                    elevation: 5,
-                    child: Container(
-                        height: 150,
-                        width:MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                          color: Colors.deepOrange,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child:  Padding(
-                          padding: EdgeInsets.all(15.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CircleAvatar(
-                                radius: 10,
-                                //   backgroundImage:AssetImage('assets/images/profile.png'),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Text("Total Account balance Daimond"),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "Total= $totalResult",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                  Icon(
-                                    FontAwesomeIcons.sketch,
-                                  )
-                                ],
-                              ),
-                            ],
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      elevation: 5,
+                      child: Container(
+                          height: 150,
+                          width:MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            color: Colors.deepOrange,
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        )),
+                          child:  Padding(
+                            padding: EdgeInsets.all(15.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CircleAvatar(
+                                  radius: 10,
+                                  //   backgroundImage:AssetImage('assets/images/profile.png'),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text("Total Account balance Daimond"),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      "Total Daimond= $totalResult",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                    Icon(
+                                      FontAwesomeIcons.sketch,
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )),
+                    ),
                   ),
                   SizedBox(
                     height: 10,
                   ),
-                  Card(
-                    elevation: 5,
-                    child: Container(
-                        height: 150,
-                        width:MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                          color: Colors.deepOrange,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child:  Padding(
-                          padding: EdgeInsets.all(15.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CircleAvatar(
-                                radius: 10,
-                                //   backgroundImage:AssetImage('assets/images/profile.png'),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Text("Total Account balance "),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "Total= $total_taka",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Tk",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      elevation: 5,
+                      child: Container(
+                          height: 150,
+                          width:MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            color: Colors.deepOrange,
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        )),
+                          child:  Padding(
+                            padding: EdgeInsets.all(15.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CircleAvatar(
+                                  radius: 10,
+                                  //   backgroundImage:AssetImage('assets/images/profile.png'),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text("Total Account balance "),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  children: [   //total_taka > 0? Text("Total= ${total_taka}",style: TextStyle(fontSize: 20,),): Image.network(userData['user_photo']),
+                                  Text("Total Taka:$TotalUsertaka",style: TextStyle(fontSize: 20,)),
+                                      // total_taka > 0? Text("Total= ${total_taka-1}",style: TextStyle(fontSize: 20,),): Text("Total= ${total_taka+1}",style: TextStyle(fontSize: 20,),)
+
+                                    Text(
+                                      "Tk",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )),
+                    ),
                   ),
                   SizedBox(
                     height: 10,
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 40,
-                        child: Card(
-                          elevation: 5,
-                          child: Container(
-                              height: 90,
-                              width:MediaQuery.of(context).size.width,
-                              decoration: BoxDecoration(
-                                color: Colors.teal[900],
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: InkWell(
-                                onTap: () {},
-                                child: Column(
-                                  //mainAxisAlignment: MainAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      height: 15,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        " Total Diposit daimond", //Diamond
-                                        style: TextStyle(color: Colors.white),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 40,
+                          child: Card(
+                            elevation: 5,
+                            child: Container(
+                                height: 90,
+                                width:MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
+                                  color: Colors.teal[900],
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: InkWell(
+                                  onTap: () {},
+                                  child: Column(
+                                    //mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 15,
                                       ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                            left: 16.0,
-                                          ),
-                                          child: Text(
-                                            "$totalUserDiamond  ",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.white),
-                                          ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          " Total Diposit daimond", //Diamond
+                                          style: TextStyle(color: Colors.white),
                                         ),
-                                        Padding(
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Padding(
                                             padding: EdgeInsets.only(
                                               left: 16.0,
                                             ),
-                                            child: Icon(
-                                              FontAwesomeIcons.sketch,
-                                              color: Colors.black,
-                                            ))
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              )),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 40,
-                        child: Card(
-                          elevation: 5,
-                          child: Container(
-                              height: 90,
-                              width:MediaQuery.of(context).size.width,
-                              decoration: BoxDecoration(
-                                color: Colors.teal[900],
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: InkWell(
-                                onTap: () {},
-                                child: Column(
-                                  //mainAxisAlignment: MainAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      height: 15,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        left: 16.0,
+                                            child: Text(
+                                              "$totalUserDiamond  ",
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                          Padding(
+                                              padding: EdgeInsets.only(
+                                                left: 16.0,
+                                              ),
+                                              child: Icon(
+                                                FontAwesomeIcons.sketch,
+                                                color: Colors.black,
+                                              ))
+                                        ],
                                       ),
-                                      child: Text(
-                                        " Total diposit amount ", //Total Diamond
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Row(
-                                      children: [
-
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                            left: 16.0,
-                                          ),
-                                          child: Text(
-                                            "$todayResult",
-                                            style: TextStyle(
-                                                color: Colors.white),
-                                          ),
-                                        ),
-
-
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                            left: 16.0,
-                                          ),
-                                          child: Text(
-                                            "Taka",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.white),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              )),
+                                    ],
+                                  ),
+                                )),
+                          ),
                         ),
-                      ),
-                    ],
+                        Expanded(
+                          flex: 40,
+                          child: Card(
+                            elevation: 5,
+                            child: Container(
+                                height: 90,
+                                width:MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
+                                  color: Colors.teal[900],
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: InkWell(
+                                  onTap: () {},
+                                  child: Column(
+                                    //mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 15,
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                          left: 16.0,
+                                        ),
+                                        child: Text(
+                                          " Total diposit amount ", //Total Diamond
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Row(
+                                        children: [
+
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: 16.0,
+                                            ),
+                                            child: Text(
+                                              "$todayResult",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+
+
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: 16.0,
+                                            ),
+                                            child: Text(
+                                              "Taka",
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 50,
-                        child: Card(
-                          elevation: 5,
-                          child: Container(
-                              height: 90,
-                             width:MediaQuery.of(context).size.width,
-                              decoration: BoxDecoration(
-                                color: Colors.teal[900],
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: InkWell(
-                                onTap: () {},
-                                child: Column(
-                                  //mainAxisAlignment: MainAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      height: 15,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        left: 16.0,
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 50,
+                          child: Card(
+                            elevation: 5,
+                            child: Container(
+                                height: 90,
+                               width:MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
+                                  color: Colors.teal[900],
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: InkWell(
+                                  onTap: () {},
+                                  child: Column(
+                                    //mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 15,
                                       ),
-                                      child: Text(
-                                        "Today Deposit Daimond",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                            left: 16.0,
-                                          ),
-                                          child: Text(
-                                            "$totalDepositAmount",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.white),
-                                          ),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                          left: 16.0,
                                         ),
-                                        Padding(
+                                        child: Text(
+                                          "Today Deposit Daimond",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Padding(
                                             padding: EdgeInsets.only(
                                               left: 16.0,
                                             ),
-                                            child: Icon(
-                                              FontAwesomeIcons.sketch,
-                                              color: Colors.black,
-                                            ))
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              )),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 50,
-                        child: Card(
-                          elevation: 5,
-                          child: Container(
-                              height: 90,
-                              width:MediaQuery.of(context).size.width,
-                              decoration: BoxDecoration(
-                                color: Colors.teal[900],
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: InkWell(
-                                onTap: () {},
-                                child: Column(
-                                  //mainAxisAlignment: MainAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      height: 15,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        left: 16.0,
+                                            child: Text(
+                                              "$todayUserDiamond",
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                          Padding(
+                                              padding: EdgeInsets.only(
+                                                left: 16.0,
+                                              ),
+                                              child: Icon(
+                                                FontAwesomeIcons.sketch,
+                                                color: Colors.black,
+                                              ))
+                                        ],
                                       ),
-                                      child: Text(
-                                        "Today Diposit Taka",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                            left: 16.0,
-                                          ),
-                                          child: Text(
-                                            "$todayDepositAmount",//totalDepositAmount
-                                            style: TextStyle(
-                                                color: Colors.white),
-                                          ),
-                                        ),
-
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                            left: 10.0,
-                                          ),
-                                          child: Text(
-                                            "Taka",
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.white),
-                                          ),
-                                        ),
-
-
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              )),
+                                    ],
+                                  ),
+                                )),
+                          ),
                         ),
-                      ),
-                    ],
+                        Expanded(
+                          flex: 50,
+                          child: Card(
+                            elevation: 5,
+                            child: Container(
+                                height: 90,
+                                width:MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
+                                  color: Colors.teal[900],
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: InkWell(
+                                  onTap: () {},
+                                  child: Column(
+                                    //mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 15,
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                          left: 16.0,
+                                        ),
+                                        child: Text(
+                                          "Today Diposit Taka",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: 16.0,
+                                            ),
+                                            child: Text(
+                                              "$todayDepositAmount",//totalDepositAmount
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: 10.0,
+                                            ),
+                                            child: Text(
+                                              "Taka",
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+
+
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               );

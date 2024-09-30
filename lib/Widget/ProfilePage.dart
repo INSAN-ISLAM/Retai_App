@@ -57,11 +57,8 @@ var UserId;
                 horizontal: 16, vertical: 0),
             leading:  CircleAvatar(
               radius: 30,
-                backgroundImage: NetworkImage(
-                  "${data['user_photo']}",
-                 // fit: BoxFit.fill,
-                )
-
+                child:data['user_photo'] ==null? Icon(Icons.person,size: 40,): Image.network("${data['user_photo']}", fit: BoxFit.fill,)
+//userData['user_photo'] ==null? Icon(Icons.person,size: 40,): Image.network(userData['user_photo']),
 
 
             ),

@@ -5,7 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:ratailapp/Widget/AppEevatedButton.dart';
 import 'package:ratailapp/Widget/AppTextField.dart';
 import 'package:ratailapp/Widget/SnackBar.dart';
-import 'package:ratailapp/App/Screen/RechargeHisPage.dart'; // Import the screen
+import 'package:ratailapp/App/Screen/RechargeHisPage.dart';
+
+import 'NavigationBar.dart'; // Import the screen
 
 class CreateTransferScreen extends StatefulWidget {
   const CreateTransferScreen({Key? key}) : super(key: key);
@@ -17,11 +19,13 @@ class CreateTransferScreen extends StatefulWidget {
 class _CreateTransferScreenState extends State<CreateTransferScreen> {
   final TextEditingController AmountETController = TextEditingController();
   final TextEditingController ReceiptIDETController = TextEditingController();
+
   final user = FirebaseAuth.instance.currentUser;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? currentDiamondValue;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   double? userRate;
+  String? userName;
   @override
   void initState() {
     super.initState();
@@ -37,7 +41,9 @@ class _CreateTransferScreenState extends State<CreateTransferScreen> {
     if (documentSnapshot.exists) {
       setState(() {
         userRate = documentSnapshot.get('rate');
-        print(userRate);
+        userName = documentSnapshot.get('name');
+        //print(userRate);
+        //print(userName);
       });
     }
   }
@@ -62,19 +68,24 @@ class _CreateTransferScreenState extends State<CreateTransferScreen> {
   }
 
   Future<void> updateProfile() async {
-    var _amount= int.parse(AmountETController.text);
-    print(userRate);
+   var _amount= int.parse(AmountETController.text);
+ //  print(userRate);
+   var TotalTaka=((100 * _amount)/userRate!);
 
-    var total_taka=((100 * _amount)/userRate!);
 
+    // //double value = double.tryParse(AmountETController.text) ?? 0.0;
+    // String input=  AmountETController.text;
+    // double value = double.tryParse(input) ?? 0.0;
+    // String fixedValue = value.toStringAsFixed(2);
     try {
       await FirebaseFirestore.instance.collection('ReceiptDetails').add({
+        'name': userName,
         'TransferDiamond': AmountETController.text,
         'ReceiptNumber': ReceiptIDETController.text,
         'Status': 'Pending',
         'created_at': FieldValue.serverTimestamp(),
         'user': user!.uid,
-        'amount':total_taka.toInt(),
+        'amount':TotalTaka.toInt(),
       });
 
       showSnackBarMessage(
@@ -83,7 +94,8 @@ class _CreateTransferScreenState extends State<CreateTransferScreen> {
       // Navigate to ReceiptAcceptScreen
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ReceiptAcceptScreen()),
+        MaterialPageRoute(
+            builder: (context) => MainBottomNavBar()),
       );
     } catch (e) {
       print('Error signing up: $e');
@@ -103,7 +115,7 @@ class _CreateTransferScreenState extends State<CreateTransferScreen> {
               Card(
                 elevation: 5,
                 child: Container(
-                  height: 350,
+                  height: 300,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -120,6 +132,7 @@ class _CreateTransferScreenState extends State<CreateTransferScreen> {
                           Text("Receipt Number"),
                           SizedBox(height: 3),
                           AppTextFieldWidget(
+                            keyboardType:TextInputType.number,
                             controller: ReceiptIDETController,
                             validator: (value) {
                               if ((value?.isEmpty ?? true) &&
@@ -129,14 +142,15 @@ class _CreateTransferScreenState extends State<CreateTransferScreen> {
                               return null;
                             },
                             onChanged: (value) {},
-                            hintText: 'Receipt Number',
+                            hintText: 'receipt Number',
                           ),
                           SizedBox(height: 3),
                           Text("Diamond"),
-                          SizedBox(height: 3),
+                          SizedBox(height: 5),
                           AppTextFieldWidget(
+                            keyboardType:TextInputType.number,
                             controller: AmountETController,
-                            hintText: "Transfer Diamond",
+                            hintText: "transfer Diamond",
                             validator: (value) {
                               if ((value?.isEmpty ?? true) &&
                                   ((value?.length ?? 0) < 6)) {
@@ -146,7 +160,7 @@ class _CreateTransferScreenState extends State<CreateTransferScreen> {
                             },
                             onChanged: (value) {},
                           ),
-                          SizedBox(height: 5),
+                          SizedBox(height: 10),
                           AppElevatedButton(
                             Color: Colors.green,
                             onTap:  () async {

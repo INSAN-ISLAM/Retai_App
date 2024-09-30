@@ -13,6 +13,7 @@ import 'package:ratailapp/Widget/AppTextField.dart';
 import 'dart:io';
 import '../../Widget/GetUpDateNumPage.dart';
 import 'DepositHisPage.dart';
+import 'NavigationBar.dart';
 
 class DepositScreen extends StatefulWidget {
   const DepositScreen({
@@ -104,11 +105,11 @@ class PayMentPage extends StatefulWidget {
 }
 
 class _PayMentPageState extends State<PayMentPage> {
-  final TextEditingController _nameETController = TextEditingController();
   final TextEditingController _AmountETController = TextEditingController();
   final TextEditingController _TrxIDETController = TextEditingController();
   final TextEditingController _RateRETController = TextEditingController();
   final TextEditingController _PhNumETController = TextEditingController();
+
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool m = true;
@@ -119,7 +120,8 @@ class _PayMentPageState extends State<PayMentPage> {
   final List<String> _gateways = ['Bkash', 'Nagad'];
   final user = FirebaseAuth.instance.currentUser;
   double? userRate;
-  int? userNumber;
+  String? userNumber;
+  String? userName;
   bool _isLoading=false;
   XFile? userPhoto;
   @override
@@ -145,36 +147,40 @@ class _PayMentPageState extends State<PayMentPage> {
       setState(() {
         userRate = documentSnapshot.get('rate');
         userNumber = documentSnapshot.get('mobile');
+        userName = documentSnapshot.get('name');
 
-        //print(userRate);
+        print(userName);
       });
     }
   }
 
   Future<void> updateProfile(String userPhotoUrl) async {
-
+  String input=  _TrxIDETController.text;
+  double value = double.tryParse(input) ?? 0.0;
+  String fixedValue = value.toStringAsFixed(2);
     _isLoading = true;
     final user = FirebaseAuth.instance.currentUser;
     try {
       await FirebaseFirestore.instance.collection('DepositDetails').add({
         'Amount': int.tryParse(_AmountETController.text) ?? 0,
         'TrxID': _TrxIDETController.text,
-        'User Diamond': _RateRETController.text,
+        'User Diamond': fixedValue,
         'Payment Gateway': _selectedGateway,
         'PhNum': _PhNumETController.text,
         'Status': 'unpaid',
         'created_at': FieldValue.serverTimestamp(),
         'user': user!.uid,
         'mobile': userNumber,
+        'name': userName,
         'user_photo': userPhotoUrl,
       }).then((_) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
                 'Deposit Request Send To Admin successfully, Please Wait For Accept ')));
-
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => OrderScreen()),
+          MaterialPageRoute(
+              builder: (context) => MainBottomNavBar()),
         );
       }).catchError((error) {
         ScaffoldMessenger.of(context)
@@ -258,7 +264,6 @@ class _PayMentPageState extends State<PayMentPage> {
                   },
                 ),
                 const SizedBox(height: 12),
-
                 AppTextFieldWidget(
                   controller: _AmountETController,
                   hintText: 'Amount',
@@ -315,9 +320,9 @@ class _PayMentPageState extends State<PayMentPage> {
                       onTap: () async{
                         if (_formKey.currentState!.validate()) {
                           _uploadImageAndGetLink();
+
                         }
-                        // String imageUrl= await uploadFile(userPhoto!);
-                        // print("Image"+imageUrl.toString());
+
 
                       },
 

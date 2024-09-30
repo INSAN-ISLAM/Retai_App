@@ -15,6 +15,7 @@ class AppTextFieldWidget extends StatelessWidget {
     this.suffixIcon,
     this.prefixIcon,
     this.onChanged,
+     this.keyboardType,
   }) : super(key: key);
   final Widget? suffixIcon;
   final Widget? prefixIcon;
@@ -22,6 +23,7 @@ class AppTextFieldWidget extends StatelessWidget {
   final TextEditingController controller;
   final bool? obscureText;
   final int? maxLines;
+  final TextInputType? keyboardType;
   final Function(String?)? validator;
   final bool? readOnly;
   final Function(String?)? onChanged ;
@@ -29,6 +31,7 @@ class AppTextFieldWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      keyboardType: keyboardType,
       onChanged: onChanged,
       controller: controller,
       obscureText: obscureText ?? false,

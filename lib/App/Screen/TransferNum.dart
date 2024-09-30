@@ -8,8 +8,10 @@ import 'package:ratailapp/App/HomePageConttroller/HomePageController.dart';
 import 'package:ratailapp/Widget/AppEevatedButton.dart';
 
 import 'package:ratailapp/Widget/SnackBar.dart';
-import 'package:ratailapp/App/Screen/TransferHisPage.dart';
+
 import 'package:dropdown_search/dropdown_search.dart';
+
+import 'NavigationBar.dart';
 
 class TransferDaimondImoScreen extends StatefulWidget {
   const TransferDaimondImoScreen({Key? key}) : super(key: key);
@@ -71,7 +73,8 @@ class _TransferDaimondImoScreenState extends State<TransferDaimondImoScreen> {
       showSnackBarMessage(context, 'Transfer successful!');
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => TransferScreen()),
+        MaterialPageRoute(
+            builder: (context) => MainBottomNavBar()),
       );
     } catch (e) {
       print('Error updating profile: $e');

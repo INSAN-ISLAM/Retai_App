@@ -2,12 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
-import 'package:ratailapp/App/Screen/HomePage.dart';
+
 import 'package:ratailapp/App/Screen/NavigationBar.dart';
-import 'package:ratailapp/App/Screen/SignUpPage.dart';
+
 import 'package:ratailapp/Widget/AppEevatedButton.dart';
 import 'package:ratailapp/Widget/AppTextField.dart';
-import 'package:ratailapp/main.dart';
+
 
 import 'ResetPassword.dart';
 

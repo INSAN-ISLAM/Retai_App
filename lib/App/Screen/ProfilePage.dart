@@ -1,7 +1,5 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:get/get.dart';
-import 'package:path/path.dart' as Path;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -26,11 +24,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _addressController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  bool _isSubmitted = false;
   String? imgUrl;
   final user = FirebaseAuth.instance.currentUser;
   XFile? nidFrontPart;
   XFile? nidBackPart;
   XFile? userPhoto;
+  String? personInf;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserRate();
+   ;
+  }
+
+
+  void _fetchUserRate() async {
+    DocumentSnapshot documentSnapshot =
+    await _firestore.collection('Check').doc(user!.uid).get();
+
+    if (documentSnapshot.exists) {
+      setState(() {
+        personInf = documentSnapshot.get('personInf');
+         print(personInf);
+      });
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -38,99 +60,123 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                UserProfileWidget(),
-                const SizedBox(height: 12),
-                AppTextFieldWidget(
-                  controller: _nameController,
-                  hintText: 'Name',
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Please enter your name';
-                    }
-                    return null;
-                  },
-                ),
-              
-                const SizedBox(height: 12),
-                AppTextFieldWidget(
-                  controller: _addressController,
-                  hintText: 'Address',
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Please enter your address';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                AppTextFieldWidget(
-                  controller: _whatsAppController,
-                  hintText: 'WhatsApp Number',
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Please enter your WhatsApp number';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                buildImagePicker(
-                  'NID Front Photo',
-                  nidFrontPart?.name ?? '',
-                  nidFrontPartPicker,
-                ),
-                const SizedBox(height: 12),
-                buildImagePicker(
-                  'NID Back Photo',
-                  nidBackPart?.name ?? '',
-                  nidBackPartPicker,
-                ),
-                const SizedBox(height: 12),
-                buildImagePicker(
-                  'Selfie',
-                  userPhoto?.name ?? '',
-                  userPhotoPicker,
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  height: 48,
-                  width: 358,
-                  child: _isLoading
-                      ? Center(child: CircularProgressIndicator())
-                      : AppElevatedButton(
-                    onTap: () {
-                      if (_formKey.currentState!.validate()) {
-                        uploadImageAndGetLink();
-                      }
-                    },
-                    child: Center(
-                      child: Text(
-                        "Submit",
-                        style: GoogleFonts.poppins(
-                          textStyle: const TextStyle(
-                            color: Color(0xFFFFFFFF),
-                            fontSize: 14,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children:<Widget> [
+              UserProfileWidget(),
+              const SizedBox(height: 12),
+
+              if (!_isSubmitted) ...[
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
+                      AppTextFieldWidget(
+                        controller: _nameController,
+                        hintText: 'Name',
+                        validator: (value) {
+                          if (value?.isEmpty ?? true) {
+                            return 'Please enter your name';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      AppTextFieldWidget(
+                        controller: _addressController,
+                        hintText: 'Address',
+                        validator: (value) {
+                          if (value?.isEmpty ?? true) {
+                            return 'Please enter your address';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      AppTextFieldWidget(
+                        controller: _whatsAppController,
+                        hintText: 'WhatsApp Number',
+                        validator: (value) {
+                          if (value?.isEmpty ?? true) {
+                            return 'Please enter your WhatsApp number';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      buildImagePicker(
+                        'NID Front Photo',
+                        nidFrontPart?.name ?? '',
+                        nidFrontPartPicker,
+                      ),
+                      const SizedBox(height: 12),
+                      buildImagePicker(
+                        'NID Back Photo',
+                        nidBackPart?.name ?? '',
+                        nidBackPartPicker,
+                      ),
+                      const SizedBox(height: 12),
+                      buildImagePicker(
+                        'Selfie',
+                        userPhoto?.name ?? '',
+                        userPhotoPicker,
+                      ),
+
+                      const SizedBox(height: 12),
+                      Container(
+                        height: 48,
+                        width: 358,
+                        child: _isLoading
+                            ? Center(child: CircularProgressIndicator())
+                            : AppElevatedButton(
+                          onTap: () {
+                            if (_formKey.currentState!.validate()) {
+                              uploadImageAndGetLink();
+                            }
+                          },
+                          child: Center(
+                            child: Text(
+                              "Submit",
+                              style: GoogleFonts.poppins(
+                                textStyle: const TextStyle(
+                                  color: Color(0xFFFFFFFF),
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+
+
+
+
+                    ],
                   ),
                 ),
+              ]
+              else ...[
+                // Confirmation message after form submission
+                Center(
+                  child: CircleAvatar(
+                    radius: 100,
+                    foregroundColor: Colors.pink,
+                    child: Center(child: Icon(Icons.done_outline,size: 50,color: Colors.green[900],)),
+                  ),
+                ),
+
               ],
-            ),
+
+
+
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget buildImagePicker(
-      String title, String fileName, VoidCallback onTap) {
+  Widget buildImagePicker(String title, String fileName, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
       child: Row(
@@ -332,7 +378,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'whats_app': _whatsAppController.text,
         'address': _addressController.text,
         'name': _nameController.text,
-        //'uid': user!.uid,
+        'personInf': 'Success',
         'nid_front': frontPartUrl,
         'nid_back': backPartUrl,
         'user_photo': userPhotoUrl,
@@ -343,4 +389,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
       print(e);
     }
   }
+
 }
