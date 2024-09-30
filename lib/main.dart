@@ -1,12 +1,15 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 
 import 'package:ratailapp/App/Screen/LogInPage.dart';
 import 'package:ratailapp/App/Screen/NavigationBar.dart';
+import 'package:ratailapp/core/access_token.dart';
+import 'package:ratailapp/core/notification_services.dart';
 
 import 'package:ratailapp/firebase_options.dart';
 
@@ -17,8 +20,60 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  NotificationServices().initNotification();
+
+
+  initializeNotification();
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+
+  handleForegroundMessage();
+
   runApp( MyApp());
 }
+
+
+initializeNotification () async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  print('User granted permission: ${settings.authorizationStatus}');
+}
+
+handleForegroundMessage () {
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Got a message whilst in the foreground!');
+    print('Message data: ${message.data}');
+
+    if (message.notification != null) {
+      print('Message also contained a notification: ${message.notification}');
+      NotificationServices().showNotification(
+        title: message.notification!.title,
+        body: message.notification!.body,
+      );
+    }
+  });
+}
+
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  await Firebase.initializeApp();
+
+  print("Handling a background message: ${message.messageId}");
+}
+
 class MyApp extends StatefulWidget {
   MyApp({Key? key}) : super(key: key);
 

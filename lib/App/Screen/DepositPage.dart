@@ -1,7 +1,6 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -9,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ratailapp/Widget/AppEevatedButton.dart';
 import 'package:ratailapp/Widget/AppTextField.dart';
+import 'package:ratailapp/core/firebase_api.dart';
 
 import 'dart:io';
 import '../../Widget/GetUpDateNumPage.dart';
@@ -25,8 +25,6 @@ class DepositScreen extends StatefulWidget {
 }
 
 class _DepositScreenState extends State<DepositScreen> {
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,12 +49,8 @@ class _DepositScreenState extends State<DepositScreen> {
             Center(
               child: OutlinedButton(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              PayMentPage()));
-
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => PayMentPage()));
                 },
                 child: SvgPicture.asset(
                   'assets/images/BKashLogo.svg',
@@ -70,13 +64,8 @@ class _DepositScreenState extends State<DepositScreen> {
             Center(
               child: OutlinedButton(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              PayMentPage()));
-
-
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => PayMentPage()));
                 },
                 child: SvgPicture.asset(
                   'assets/images/NagadLogo.svg',
@@ -110,7 +99,6 @@ class _PayMentPageState extends State<PayMentPage> {
   final TextEditingController _RateRETController = TextEditingController();
   final TextEditingController _PhNumETController = TextEditingController();
 
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool m = true;
 
@@ -122,8 +110,9 @@ class _PayMentPageState extends State<PayMentPage> {
   double? userRate;
   String? userNumber;
   String? userName;
-  bool _isLoading=false;
+  bool _isLoading = false;
   XFile? userPhoto;
+
   @override
   void initState() {
     super.initState();
@@ -133,7 +122,7 @@ class _PayMentPageState extends State<PayMentPage> {
 
   void _fetchData() async {
     QuerySnapshot querySnapshot =
-    await _firestore.collection('DepositDetails').get();
+        await _firestore.collection('DepositDetails').get();
     setState(() {
       m = false;
     });
@@ -141,7 +130,7 @@ class _PayMentPageState extends State<PayMentPage> {
 
   void _fetchUserRate() async {
     DocumentSnapshot documentSnapshot =
-    await _firestore.collection('Check').doc(user!.uid).get();
+        await _firestore.collection('Check').doc(user!.uid).get();
 
     if (documentSnapshot.exists) {
       setState(() {
@@ -155,9 +144,9 @@ class _PayMentPageState extends State<PayMentPage> {
   }
 
   Future<void> updateProfile(String userPhotoUrl) async {
-  String input=  _TrxIDETController.text;
-  double value = double.tryParse(input) ?? 0.0;
-  String fixedValue = value.toStringAsFixed(2);
+    String input = _TrxIDETController.text;
+    double value = double.tryParse(input) ?? 0.0;
+    String fixedValue = value.toStringAsFixed(2);
     _isLoading = true;
     final user = FirebaseAuth.instance.currentUser;
     try {
@@ -173,14 +162,27 @@ class _PayMentPageState extends State<PayMentPage> {
         'mobile': userNumber,
         'name': userName,
         'user_photo': userPhotoUrl,
-      }).then((_) {
+      }).then((_) async {
+        // Get Admin Info
+        final admin = await FirebaseFirestore.instance
+            .collection('admins')
+            .doc('milonc70@gmail.com')
+            .get();
+
+        final token = admin['token'];
+
+        FirebaseApi.sendMessage(
+          'New Deposit Request',
+          '$userName has been requested for a deposit of ${_AmountETController.text}',
+          token,
+        );
+
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
                 'Deposit Request Send To Admin successfully, Please Wait For Accept ')));
         Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) => MainBottomNavBar()),
+          MaterialPageRoute(builder: (context) => MainBottomNavBar()),
         );
       }).catchError((error) {
         ScaffoldMessenger.of(context)
@@ -190,7 +192,7 @@ class _PayMentPageState extends State<PayMentPage> {
       print('Error signing up: $e');
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Registration Failed! Try again')));
-    }finally {
+    } finally {
       setState(() {
         _isLoading = false;
       });
@@ -210,7 +212,6 @@ class _PayMentPageState extends State<PayMentPage> {
               children: [
                 const SizedBox(height: 12),
                 UserProfileWidget(),
-
                 const SizedBox(height: 12),
                 Text('Payment Information',
                     style: GoogleFonts.poppins(
@@ -280,8 +281,10 @@ class _PayMentPageState extends State<PayMentPage> {
                         // print('value: $value, userRate: $userRate');
                         if (value != null) {
                           final amount = int.tryParse(value) ?? 0;
-                          final rateInt = userRate!; // Convert userRate to integer
-                          _RateRETController.text = ((amount * rateInt/ 100) ).toString(); // Use integer division
+                          final rateInt =
+                              userRate!; // Convert userRate to integer
+                          _RateRETController.text = ((amount * rateInt / 100))
+                              .toString(); // Use integer division
                         } else {
                           // Handle the case where value is null
                           _RateRETController.text = '0';
@@ -299,47 +302,38 @@ class _PayMentPageState extends State<PayMentPage> {
                   controller: _RateRETController,
                   hintText: 'Diamond',
                   readOnly:
-                  true, // Set the text field to read-only instead of using enabled
+                      true, // Set the text field to read-only instead of using enabled
                 ),
-
                 const SizedBox(height: 12),
                 buildImagePicker(
                   'screen_short',
                   userPhoto?.name ?? '',
                   userPhotoPicker,
-
                 ),
                 const SizedBox(height: 12),
                 Container(
                   height: 48,
                   width: 358,
-                  child:_isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  :   AppElevatedButton(
-                    
-                      onTap: () async{
-                        if (_formKey.currentState!.validate()) {
-                          _uploadImageAndGetLink();
-
-                        }
-
-
-                      },
-
-
-
-                    child: Center(
-                      child: Text(
-                        "Deposit Now",
-                        style: GoogleFonts.poppins(
-                          textStyle: const TextStyle(
-                            color: Color(0xFFFFFFFF),
-                            fontSize: 14,
+                  child: _isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : AppElevatedButton(
+                          onTap: () async {
+                            if (_formKey.currentState!.validate()) {
+                              _uploadImageAndGetLink();
+                            }
+                          },
+                          child: Center(
+                            child: Text(
+                              "Deposit Now",
+                              style: GoogleFonts.poppins(
+                                textStyle: const TextStyle(
+                                  color: Color(0xFFFFFFFF),
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
                 ),
                 const SizedBox(height: 14),
               ],
@@ -349,8 +343,8 @@ class _PayMentPageState extends State<PayMentPage> {
       ),
     );
   }
-  Widget buildImagePicker(
-      String title, String fileName, VoidCallback onTap) {
+
+  Widget buildImagePicker(String title, String fileName, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
       child: Row(
@@ -397,14 +391,14 @@ class _PayMentPageState extends State<PayMentPage> {
             children: [
               ListTile(
                 onTap: () async {
-                XFile ? userImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+                  XFile? userImage = await ImagePicker()
+                      .pickImage(source: ImageSource.gallery);
                   Navigator.of(context).pop();
                   if (userImage != null) {
                     setState(() {
-                     userPhoto=userImage;
+                      userPhoto = userImage;
                     });
-
-                  }else{
+                  } else {
                     print('Image is null');
                   }
                 },
@@ -427,7 +421,6 @@ class _PayMentPageState extends State<PayMentPage> {
     return await storageRef.getDownloadURL();
   }
 
-
   Future<void> _uploadImageAndGetLink() async {
     if (userPhoto == null) {
       return;
@@ -442,10 +435,8 @@ class _PayMentPageState extends State<PayMentPage> {
       //print(' url:${userPhotoUrl}');
       await updateProfile(userPhotoUrl);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Data uploaded successfully'))
-      );
-
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Data uploaded successfully')));
     } catch (e) {
       print(e);
     } finally {
@@ -454,13 +445,4 @@ class _PayMentPageState extends State<PayMentPage> {
       });
     }
   }
-
-
-
-
-
-
-
-
-
 }

@@ -7,6 +7,7 @@ import 'package:ratailapp/Widget/AppTextField.dart';
 import 'package:ratailapp/Widget/SnackBar.dart';
 import 'package:ratailapp/App/Screen/RechargeHisPage.dart';
 
+import '../../core/firebase_api.dart';
 import 'NavigationBar.dart'; // Import the screen
 
 class CreateTransferScreen extends StatefulWidget {
@@ -86,6 +87,20 @@ class _CreateTransferScreenState extends State<CreateTransferScreen> {
         'created_at': FieldValue.serverTimestamp(),
         'user': user!.uid,
         'amount':TotalTaka.toInt(),
+      }).then((value) async {
+        // Get Admin Info
+        final admin = await FirebaseFirestore.instance
+            .collection('admins')
+            .doc('milonc70@gmail.com')
+            .get();
+
+        final token = admin['token'];
+
+        FirebaseApi.sendMessage(
+          'New Recharge Request',
+          '$userName has been requested for a recharge of ${AmountETController.text}',
+          token,
+        );
       });
 
       showSnackBarMessage(

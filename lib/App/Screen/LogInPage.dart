@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
@@ -33,6 +35,11 @@ class _LogInSreenState extends State<LogInSreen> {
         password: _passwordETController.text,
       );
       // User logged in successfully
+
+      await FirebaseFirestore.instance.collection('Check').doc(result.user!.uid).update({
+        'token' : await FirebaseMessaging.instance.getToken(),
+      });
+
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => MainBottomNavBar()));
       print('User logged in: ${result.user!.uid}');
