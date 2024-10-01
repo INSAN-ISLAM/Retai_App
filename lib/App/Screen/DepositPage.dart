@@ -107,7 +107,7 @@ class _PayMentPageState extends State<PayMentPage> {
   String? _selectedGateway;
   final List<String> _gateways = ['Bkash', 'Nagad'];
   final user = FirebaseAuth.instance.currentUser;
-  double? userRate;
+  late num userRate;
   String? userNumber;
   String? userName;
   bool _isLoading = false;
@@ -144,7 +144,7 @@ class _PayMentPageState extends State<PayMentPage> {
   }
 
   Future<void> updateProfile(String userPhotoUrl) async {
-    String input = _TrxIDETController.text;
+    String input = _RateRETController.text;
     double value = double.tryParse(input) ?? 0.0;
     String fixedValue = value.toStringAsFixed(2);
     _isLoading = true;
@@ -281,8 +281,7 @@ class _PayMentPageState extends State<PayMentPage> {
                         // print('value: $value, userRate: $userRate');
                         if (value != null) {
                           final amount = int.tryParse(value) ?? 0;
-                          final rateInt =
-                              userRate!; // Convert userRate to integer
+                          final rateInt = userRate!; // Convert userRate to integer
                           _RateRETController.text = ((amount * rateInt / 100))
                               .toString(); // Use integer division
                         } else {

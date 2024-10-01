@@ -43,8 +43,8 @@ class _CreateTransferScreenState extends State<CreateTransferScreen> {
       setState(() {
         userRate = documentSnapshot.get('rate');
         userName = documentSnapshot.get('name');
-        //print(userRate);
-        //print(userName);
+        print(userRate);
+        print(userName);
       });
     }
   }
@@ -79,7 +79,9 @@ class _CreateTransferScreenState extends State<CreateTransferScreen> {
     // double value = double.tryParse(input) ?? 0.0;
     // String fixedValue = value.toStringAsFixed(2);
     try {
+      print('user:$userName');
       await FirebaseFirestore.instance.collection('ReceiptDetails').add({
+
         'name': userName,
         'TransferDiamond': AmountETController.text,
         'ReceiptNumber': ReceiptIDETController.text,
