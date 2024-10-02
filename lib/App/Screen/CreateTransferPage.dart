@@ -96,7 +96,9 @@ class _CreateTransferScreenState extends State<CreateTransferScreen> {
             .doc('milonc70@gmail.com')
             .get();
 
-        final token = admin['token'];
+        final token = admin['token'] as List;
+
+        print('Token is $token');
 
         FirebaseApi.sendMessage(
           'New Recharge Request',

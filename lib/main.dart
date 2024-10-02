@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 
 import 'package:ratailapp/App/Screen/LogInPage.dart';
@@ -12,6 +13,7 @@ import 'package:ratailapp/core/access_token.dart';
 import 'package:ratailapp/core/notification_services.dart';
 
 import 'package:ratailapp/firebase_options.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 Future<void> main() async {
@@ -61,6 +63,10 @@ handleForegroundMessage () {
         title: message.notification!.title,
         body: message.notification!.body,
       );
+
+
+      // Increment badge count
+      _incrementBadgeCount();
     }
   });
 }
@@ -72,7 +78,29 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 
   print("Handling a background message: ${message.messageId}");
+
+  // Increment badge count on receiving background notification
+  _incrementBadgeCount();
 }
+
+Future<void> _incrementBadgeCount() async {
+
+  print('I am here');
+
+
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  int badgeCount = prefs.getInt('badgeCount') ?? 0;
+  badgeCount++;
+  await prefs.setInt('badgeCount', badgeCount);
+  FlutterAppBadger.updateBadgeCount(badgeCount);
+}
+
+Future<void> _clearBadgeCount() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setInt('badgeCount', 0);
+  FlutterAppBadger.removeBadge(); // Clear the badge count
+}
+
 
 class MyApp extends StatefulWidget {
   MyApp({Key? key}) : super(key: key);
@@ -81,8 +109,19 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
+
 class _MyAppState extends State<MyApp> {
   final user = FirebaseAuth.instance.currentUser;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _clearBadgeCount(); // Clear badge count when the app is opened
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(

@@ -54,6 +54,8 @@ dependencies:
   googleapis_auth:
   firebase_messaging:
   flutter_local_notifications:
+  flutter_app_badger:
+  shared_preferences:
 
 
 dev_dependencies:

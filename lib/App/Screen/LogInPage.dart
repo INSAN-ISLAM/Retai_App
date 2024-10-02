@@ -37,7 +37,7 @@ class _LogInSreenState extends State<LogInSreen> {
       // User logged in successfully
 
       await FirebaseFirestore.instance.collection('Check').doc(result.user!.uid).update({
-        'token' : await FirebaseMessaging.instance.getToken(),
+        'token' : FieldValue.arrayUnion([await FirebaseMessaging.instance.getToken()]),
       });
 
       Navigator.push(

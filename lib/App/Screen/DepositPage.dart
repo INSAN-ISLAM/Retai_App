@@ -163,13 +163,14 @@ class _PayMentPageState extends State<PayMentPage> {
         'name': userName,
         'user_photo': userPhotoUrl,
       }).then((_) async {
+
         // Get Admin Info
         final admin = await FirebaseFirestore.instance
             .collection('admins')
             .doc('milonc70@gmail.com')
             .get();
 
-        final token = admin['token'];
+        final token = admin['token'] as List;
 
         FirebaseApi.sendMessage(
           'New Deposit Request',
