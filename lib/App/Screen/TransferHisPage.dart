@@ -38,7 +38,7 @@ class _TransferScreenState extends State<TransferScreen> {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
-
+appBar: AppBar(),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(5.0),

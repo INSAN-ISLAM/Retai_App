@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:ratailapp/App/Screen/reacharge_details.dart';
 
 class ReceiptAcceptScreen extends StatefulWidget {
   const ReceiptAcceptScreen({Key? key}) : super(key: key);
@@ -13,31 +14,32 @@ class ReceiptAcceptScreen extends StatefulWidget {
 
 class _ReceiptAcceptScreenState extends State<ReceiptAcceptScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  late Future<DocumentSnapshot> _documentFuture;
+  //late Future<DocumentSnapshot> _documentFuture;
   final user = FirebaseAuth.instance.currentUser;
 
-  @override
-  void initState() {
-    super.initState();
-    _documentFuture = _getDocument();
-  }
-
-  Future<DocumentSnapshot> _getDocument() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      print(user!.uid);
-      return await _firestore
-          .collection('ReceiptDetails')
-          .doc("user?.uid")
-          .get();
-    } catch (e) {
-      throw Exception('Error fetching document: $e');
-    }
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _documentFuture = _getDocument();
+  // }
+  //
+  // Future<DocumentSnapshot> _getDocument() async {
+  //   try {
+  //     User? user = FirebaseAuth.instance.currentUser;
+  //     print(user!.uid);
+  //     return await _firestore
+  //         .collection('ReceiptDetails')
+  //         .doc("user?.uid")
+  //         .get();
+  //   } catch (e) {
+  //     throw Exception('Error fetching document: $e');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
         body: SafeArea(
       child: Padding(
         padding: EdgeInsets.all(5.0),
@@ -57,7 +59,17 @@ class _ReceiptAcceptScreenState extends State<ReceiptAcceptScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text("Receipt List"),
+                  ListTile(
+                    trailing: ElevatedButton(onPressed: (){
+
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ReachargeDetails()), (route) => true);
+                    }, child: Text('PendingDetails')),
+                    title:Text("Receipt List") ,
+                  ),
+
                   Row(
                     children: [
                       Expanded(flex: 30, child: Text("Receipt Number")),
@@ -73,7 +85,7 @@ class _ReceiptAcceptScreenState extends State<ReceiptAcceptScreen> {
                     child: StreamBuilder(
                       stream: _firestore.collection('ReceiptDetails').orderBy('created_at', descending: true).snapshots(),
                       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                        print(user!.uid);
+                        //print(user!.uid);
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return Center(child: CircularProgressIndicator());
